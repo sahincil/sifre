@@ -190,6 +190,13 @@
   </style>
 </head>
 <body>
+
+<div id="passwordGate" class="min-h-screen flex flex-col items-center justify-center bg-dark text-light p-6">
+  <h2 class="text-2xl font-heading mb-4">Şifreyi girin</h2>
+  <input type="password" id="accessPassword" placeholder="Şifre" class="input max-w-sm mb-4" />
+  <button onclick="checkAccessPassword()" class="btn btn-primary">Giriş</button>
+</div>
+
   <div id="app">
     <header class="bg-dark-light shadow-sm">
       <div class="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -951,6 +958,24 @@
       loadPasswords();
       loadThemePreferences();
     });
-  </script>
+  
+function checkAccessPassword() {
+  const input = document.getElementById("accessPassword").value;
+  const correct = "Dt150261"; // Buraya kendi şifreni yaz
+
+  if (input === correct) {
+    document.getElementById("passwordGate").style.display = "none";
+    document.getElementById("app").style.display = "block";
+  } else {
+    alert("Hatalı şifre!");
+  }
+}
+
+// Sayfa açıldığında önce sadece şifre giriş ekranı görünsün
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById("app").style.display = "none";
+});
+
+</script>
 </body>
 </html>
