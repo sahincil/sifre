@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Şifre Yöneticisi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              dark: '#1a2b4b',
+              light: '#a3c9ff',
+            },
+            secondary: {
+              turquoise: '#7ee8fa',
+              purple: '#c4b5fd',
+            },
+            dark: {
+              DEFAULT: '#121212',
+              light: '#1e1e1e',
+            },
+            light: {
+              DEFAULT: '#2d3748',
+              dark: '#1a202c',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Poppins', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/css">
+    :root {
+      --primary-dark: #1a2b4b;
+      --primary-light: #a3c9ff;
+      --secondary-turquoise: #7ee8fa;
+      --secondary-purple: #c4b5fd;
+      --dark: #121212;
+      --dark-light: #1e1e1e;
+      --light: #2d3748;
+      --light-dark: #1a202c;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+      background-color: #121212;
+      color: #e2e8f0;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .dark {
+      color-scheme: dark;
+    }
+    
+    .dark body {
+      background-color: var(--dark);
+      color: #e2e8f0;
+    }
+    
+    body:not(.dark) {
+      background-color: var(--light);
+      color: #e2e8f0;
+    }
+    
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .btn:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(var(--primary-light-rgb), 0.5);
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-dark);
+      color: #e2e8f0;
+    }
+    
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+    
+    .btn-secondary {
+      background-color: var(--secondary-purple);
+      color: var(--dark-light);
+    }
+    
+    .btn-secondary:hover {
+      opacity: 0.9;
+    }
+    
+    .btn-outline {
+      border: 1px solid var(--primary-dark);
+      color: var(--primary-light);
+    }
+    
+    .dark .btn-outline {
+      border-color: var(--primary-light);
+      color: var(--primary-light);
+    }
+    
+    .btn-outline:hover {
+      background-color: var(--primary-dark);
+      color: #e2e8f0;
+    }
+    
+    .dark .btn-outline:hover {
+      background-color: var(--primary-light);
+      color: var(--dark-light);
+    }
+    
+    .card {
+      background-color: var(--dark-light);
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+      padding: 1rem;
+      transition: all 0.3s;
+    }
+    
+    .dark .card {
+      background-color: var(--dark-light);
+    }
+    
+    .card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    }
+    
+    .input {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      border: 1px solid #4a5568;
+      background-color: #2d3748;
+      color: #e2e8f0;
+      transition: all 0.3s;
+    }
+    
+    .dark .input {
+      border-color: #4a5568;
+      background-color: #2d3748;
+      color: #e2e8f0;
+    }
+    
+    .input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(var(--primary-light-rgb), 0.5);
+    }
+    
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      backdrop-filter: blur(4px);
+    }
+    
+    .modal-content {
+      background-color: #1e1e1e;
+      border-radius: 0.5rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 28rem;
+    }
+    
+    .dark .modal-content {
+      background-color: #1e1e1e;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="bg-dark-light shadow-sm">
+      <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 class="text-xl md:text-2xl font-heading font-semibold text-primary-light">
+          Şifre Yöneticisi
+        </h1>
+        <div class="flex items-center space-x-2">
+          <button
+            id="themeCustomizerBtn"
+            class="p-2 rounded-full bg-dark-light text-light hover:bg-primary-dark transition-colors duration-300"
+            aria-label="Tema özelleştir"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+            </svg>
+          </button>
+          <button
+            id="themeToggleBtn"
+            class="p-2 rounded-full bg-dark-light text-light hover:bg-primary-dark transition-colors duration-300"
+            aria-label="Tema değiştir"
+          >
+            <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 hidden">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+            </svg>
+            <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+      <div class="relative w-full max-w-2xl mx-auto mb-6">
+        <div class="relative">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Platform veya şifre ara..."
+            class="input pl-10 w-full"
+          />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+          </svg>
+        </div>
+      </div>
+
+      <div id="passwordList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Password cards will be inserted here -->
+      </div>
+
+      <div id="emptyState" class="text-center py-10 hidden">
+        <p class="text-gray-400" id="emptyStateText">
+          Henüz kayıtlı şifre bulunmuyor.
+        </p>
+      </div>
+
+      <button
+        id="addPasswordBtn"
+        class="fixed bottom-6 right-6 p-4 rounded-full bg-primary-dark text-light shadow-lg hover:bg-opacity-90 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-light focus:ring-offset-2"
+        aria-label="Yeni şifre ekle"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+          <path fill-rule="evenodd" d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </main>
+
+    <!-- Password Form Modal -->
+    <div id="passwordFormModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="flex justify-between items-center mb-4">
+          <h2 id="modalTitle" class="text-xl font-heading font-semibold text-primary-light">
+            Yeni Şifre Ekle
+          </h2>
+          <button id="closeModalBtn" class="p-1.5 rounded-full hover:bg-dark transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <form id="passwordForm">
+          <div class="mb-4">
+            <label for="platform" class="block mb-2 font-medium">
+              Platform/Servis Adı
+            </label>
+            <input
+              type="text"
+              id="platform"
+              name="platform"
+              class="input"
+              required
+            />
+            <p id="platformError" class="mt-1 text-sm text-red-400 hidden"></p>
+          </div>
+          
+          <div class="mb-6">
+            <label for="password" class="block mb-2 font-medium">
+              Şifre
+            </label>
+            <div class="relative">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="input pr-10"
+                required
+              />
+              <button
+                type="button"
+                id="togglePasswordBtn"
+                class="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-full hover:bg-dark transition-colors"
+              >
+                <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg>
+                <svg id="eyeSlashIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 hidden">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                </svg>
+              </button>
+            </div>
+            <p id="passwordError" class="mt-1 text-sm text-red-400 hidden"></p>
+          </div>
+          
+          <div class="flex justify-end space-x-3">
+            <button
+              type="button"
+              id="cancelFormBtn"
+              class="btn btn-outline"
+            >
+              İptal
+            </button>
+            <button
+              type="submit"
+              id="savePasswordBtn"
+              class="btn btn-primary"
+            >
+              Kaydet
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Theme Customizer Modal -->
+    <div id="themeCustomizerModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-heading font-semibold text-primary-light flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+            </svg>
+            Tema Özelleştirme
+          </h2>
+          <button id="closeThemeModalBtn" class="p-1.5 rounded-full hover:bg-dark transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <div class="mb-6">
+          <h3 class="text-lg font-medium mb-3">Tema Modu</h3>
+          <div class="flex space-x-4">
+            <button
+              id="lightThemeBtn"
+              class="flex items-center justify-center p-3 rounded-lg border border-gray-700"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+              </svg>
+              <span>Açık</span>
+            </button>
+            <button
+              id="darkThemeBtn"
+              class="flex items-center justify-center p-3 rounded-lg border border-primary-light bg-primary-dark/20"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+              </svg>
+              <span>Koyu</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="mb-6">
+          <h3 class="text-lg font-medium mb-3">Ana Renk</h3>
+          <input
+            type="color"
+            id="primaryColorInput"
+            value="#1a2b4b"
+            class="w-full h-10 rounded cursor-pointer"
+          />
+        </div>
+        
+        <div class="mb-6">
+          <h3 class="text-lg font-medium mb-3">Vurgu Rengi</h3>
+          <input
+            type="color"
+            id="accentColorInput"
+            value="#c4b5fd"
+            class="w-full h-10 rounded cursor-pointer"
+          />
+        </div>
+        
+        <div class="mb-6">
+          <h3 class="text-lg font-medium mb-3">Hazır Temalar</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <button
+              class="preset-theme-btn p-2 border border-gray-700 rounded-lg hover:bg-dark transition-colors"
+              data-primary="#1a2b4b"
+              data-accent="#c4b5fd"
+              style="background: linear-gradient(135deg, #1a2b4b 0%, #1a2b4b 50%, #c4b5fd 50%, #c4b5fd 100%)"
+            >
+              <span class="block text-center bg-dark-light/90 py-1 rounded text-sm font-medium">
+                Varsayılan
+              </span>
+            </button>
+            <button
+              class="preset-theme-btn p-2 border border-gray-700 rounded-lg hover:bg-dark transition-colors"
+              data-primary="#0f172a"
+              data-accent="#7ee8fa"
+              style="background: linear-gradient(135deg, #0f172a 0%, #0f172a 50%, #7ee8fa 50%, #7ee8fa 100%)"
+            >
+              <span class="block text-center bg-dark-light/90 py-1 rounded text-sm font-medium">
+                Okyanus
+              </span>
+            </button>
+            <button
+              class="preset-theme-btn p-2 border border-gray-700 rounded-lg hover:bg-dark transition-colors"
+              data-primary="#1e293b"
+              data-accent="#f9a8d4"
+              style="background: linear-gradient(135deg, #1e293b 0%, #1e293b 50%, #f9a8d4 50%, #f9a8d4 100%)"
+            >
+              <span class="block text-center bg-dark-light/90 py-1 rounded text-sm font-medium">
+                Gece Pembe
+              </span>
+            </button>
+            <button
+              class="preset-theme-btn p-2 border border-gray-700 rounded-lg hover:bg-dark transition-colors"
+              data-primary="#312e81"
+              data-accent="#a7f3d0"
+              style="background: linear-gradient(135deg, #312e81 0%, #312e81 50%, #a7f3d0 50%, #a7f3d0 100%)"
+            >
+              <span class="block text-center bg-dark-light/90 py-1 rounded text-sm font-medium">
+                Mor Nane
+              </span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="flex justify-end">
+          <button
+            id="saveThemeBtn"
+            class="btn btn-primary"
+          >
+            Tamam
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // State
+      let passwords = [];
+      let currentPassword = null;
+      let darkMode = true;
+      let primaryColor = '#1a2b4b';
+      let accentColor = '#c4b5fd';
+
+      // DOM Elements
+      const passwordList = document.getElementById('passwordList');
+      const emptyState = document.getElementById('emptyState');
+      const emptyStateText = document.getElementById('emptyStateText');
+      const searchInput = document.getElementById('searchInput');
+      const addPasswordBtn = document.getElementById('addPasswordBtn');
+      const passwordFormModal = document.getElementById('passwordFormModal');
+      const passwordForm = document.getElementById('passwordForm');
+      const modalTitle = document.getElementById('modalTitle');
+      const platformInput = document.getElementById('platform');
+      const passwordInput = document.getElementById('password');
+      const platformError = document.getElementById('platformError');
+      const passwordError = document.getElementById('passwordError');
+      const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+      const eyeIcon = document.getElementById('eyeIcon');
+      const eyeSlashIcon = document.getElementById('eyeSlashIcon');
+      const savePasswordBtn = document.getElementById('savePasswordBtn');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const cancelFormBtn = document.getElementById('cancelFormBtn');
+      const themeToggleBtn = document.getElementById('themeToggleBtn');
+      const sunIcon = document.getElementById('sunIcon');
+      const moonIcon = document.getElementById('moonIcon');
+      const themeCustomizerBtn = document.getElementById('themeCustomizerBtn');
+      const themeCustomizerModal = document.getElementById('themeCustomizerModal');
+      const closeThemeModalBtn = document.getElementById('closeThemeModalBtn');
+      const lightThemeBtn = document.getElementById('lightThemeBtn');
+      const darkThemeBtn = document.getElementById('darkThemeBtn');
+      const primaryColorInput = document.getElementById('primaryColorInput');
+      const accentColorInput = document.getElementById('accentColorInput');
+      const saveThemeBtn = document.getElementById('saveThemeBtn');
+      const presetThemeBtns = document.querySelectorAll('.preset-theme-btn');
+
+      // Initial password data
+      const initialPasswords = [
+        {"platform":"KADRİYE","password":"310187"},
+        {"platform":"ŞAHİN","password":"310187"},
+        {"platform":"ODEO","password":"981162"},
+        {"platform":"DİGİ","password":"*Dt150261*"},
+        {"platform":"GARANTİ","password":"810162"},
+        {"platform":"E-DEVLET BEN","password":"*Ey310187*"},
+        {"platform":"E-DEVLET KAD","password":"*Ey310187*"},
+        {"platform":"ZİRAAT","password":"310187"},
+        {"platform":"FİBA","password":"310187"},
+        {"platform":"PTT","password":"802800532"},
+        {"platform":"Musteri No: 802800533","password":" f8cad3cee0"},
+        {"platform":"site","password":"buyakaevleri9/3"},
+        {"platform":"Face","password":"*Dt196119651990*"},
+        {"platform":"office 365","password":"*Dt196119651990*"}
+      ];
+
+      // Load passwords from localStorage or use initial data
+      function loadPasswords() {
+        const savedPasswords = localStorage.getItem('passwords');
+        
+        if (savedPasswords) {
+          passwords = JSON.parse(savedPasswords);
+        } else {
+          // Use initial data if no saved passwords
+          passwords = initialPasswords;
+          localStorage.setItem('passwords', JSON.stringify(passwords));
+        }
+        
+        renderPasswordList();
+      }
+
+      // Load theme preferences
+      function loadThemePreferences() {
+        const savedTheme = localStorage.getItem('theme');
+        const savedPrimaryColor = localStorage.getItem('primaryColor');
+        const savedAccentColor = localStorage.getItem('accentColor');
+        
+        if (savedTheme === 'light') {
+          darkMode = false;
+          document.documentElement.classList.remove('dark');
+          sunIcon.classList.remove('hidden');
+          moonIcon.classList.add('hidden');
+          lightThemeBtn.classList.add('border-primary-dark', 'bg-primary-light/20');
+          lightThemeBtn.classList.remove('border-gray-700');
+          darkThemeBtn.classList.remove('border-primary-light', 'bg-primary-dark/20');
+          darkThemeBtn.classList.add('border-gray-700');
+        }
+        
+        if (savedPrimaryColor) {
+          primaryColor = savedPrimaryColor;
+          primaryColorInput.value = primaryColor;
+        }
+        
+        if (savedAccentColor) {
+          accentColor = savedAccentColor;
+          accentColorInput.value = accentColor;
+        }
+        
+        applyThemeColors();
+      }
+
+      // Apply theme colors
+      function applyThemeColors() {
+        document.documentElement.style.setProperty('--primary-dark', primaryColor);
+        document.documentElement.style.setProperty('--secondary-purple', accentColor);
+        
+        // Calculate lighter version for primary-light
+        const lighterPrimary = calculateLighterColor(primaryColor);
+        document.documentElement.style.setProperty('--primary-light', lighterPrimary);
+      }
+
+      // Calculate lighter color
+      function calculateLighterColor(hexColor) {
+        const r = parseInt(hexColor.slice(1, 3), 16);
+        const g = parseInt(hexColor.slice(3, 5), 16);
+        const b = parseInt(hexColor.slice(5, 7), 16);
+        
+        const lighterR = Math.floor(r * 0.6 + 255 * 0.4).toString(16).padStart(2, '0');
+        const lighterG = Math.floor(g * 0.6 + 255 * 0.4).toString(16).padStart(2, '0');
+        const lighterB = Math.floor(b * 0.6 + 255 * 0.4).toString(16).padStart(2, '0');
+        
+        return `#${lighterR}${lighterG}${lighterB}`;
+      }
+
+      // Render password list
+      function renderPasswordList() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filteredPasswords = passwords.filter(password => {
+          return (
+            password.platform.toLowerCase().includes(searchTerm) ||
+            password.password.toLowerCase().includes(searchTerm)
+          );
+        });
+        
+        passwordList.innerHTML = '';
+        
+        if (filteredPasswords.length === 0) {
+          emptyState.classList.remove('hidden');
+          emptyStateText.textContent = searchTerm 
+            ? 'Arama sonucu bulunamadı.' 
+            : 'Henüz kayıtlı şifre bulunmuyor.';
+        } else {
+          emptyState.classList.add('hidden');
+          
+          filteredPasswords.forEach((password, index) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-lg font-semibold font-heading text-primary-light">
+                  ${password.platform}
+                </h3>
+                <div class="flex space-x-2">
+                  <button 
+                    class="edit-btn p-1.5 rounded-full hover:bg-primary-dark/20 transition-colors"
+                    aria-label="Düzenle"
+                    data-index="${index}"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 text-primary-light">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                    </svg>
+                  </button>
+                  <button 
+                    class="delete-btn p-1.5 rounded-full hover:bg-red-900/20 transition-colors"
+                    aria-label="Sil"
+                    data-index="${index}"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 text-red-400">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="mt-4 flex items-center">
+                <div class="relative flex-1">
+                  <input
+                    type="password"
+                    value="${password.password}"
+                    readonly
+                    class="input pr-20 bg-dark/50 password-field"
+                    data-index="${index}"
+                  />
+                  <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex">
+                    <button
+                      class="copy-btn p-1 mr-1 rounded-full hover:bg-dark transition-colors"
+                      aria-label="Şifreyi kopyala"
+                      data-index="${index}"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 text-gray-400">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+                      </svg>
+                    </button>
+                    <button
+                      class="toggle-visibility-btn p-1 rounded-full hover:bg-dark transition-colors"
+                      aria-label="Şifreyi göster"
+                      data-index="${index}"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 text-gray-400 eye-icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                      </svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 text-gray-400 eye-slash-icon hidden">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+            
+            passwordList.appendChild(card);
+          });
+          
+          // Add event listeners to the newly created buttons
+          document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', handleEditPassword);
+          });
+          
+          document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', handleDeletePassword);
+          });
+          
+          document.querySelectorAll('.toggle-visibility-btn').forEach(btn => {
+            btn.addEventListener('click', togglePasswordVisibility);
+          });
+          
+          document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', copyPasswordToClipboard);
+          });
+        }
+      }
+
+      // Toggle password visibility in form
+      function togglePasswordVisibilityInForm() {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        
+        if (type === 'text') {
+          eyeIcon.classList.add('hidden');
+          eyeSlashIcon.classList.remove('hidden');
+        } else {
+          eyeIcon.classList.remove('hidden');
+          eyeSlashIcon.classList.add('hidden');
+        }
+      }
+
+      // Toggle password visibility in card
+      function togglePasswordVisibility(e) {
+        const index = e.currentTarget.dataset.index;
+        const passwordField = document.querySelectorAll('.password-field')[index];
+        const eyeIcon = e.currentTarget.querySelector('.eye-icon');
+        const eyeSlashIcon = e.currentTarget.querySelector('.eye-slash-icon');
+        
+        if (passwordField.type === 'password') {
+          passwordField.type = 'text';
+          eyeIcon.classList.add('hidden');
+          eyeSlashIcon.classList.remove('hidden');
+        } else {
+          passwordField.type = 'password';
+          eyeIcon.classList.remove('hidden');
+          eyeSlashIcon.classList.add('hidden');
+        }
+      }
+
+      // Copy password to clipboard
+      function copyPasswordToClipboard(e) {
+        const index = e.currentTarget.dataset.index;
+        const password = passwords[index].password;
+        
+        navigator.clipboard.writeText(password).then(() => {
+          // Show copied indicator
+          const copyBtn = e.currentTarget;
+          const originalIcon = copyBtn.innerHTML;
+          
+          copyBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 text-green-400">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+          `;
+          
+          setTimeout(() => {
+            copyBtn.innerHTML = originalIcon;
+          }, 2000);
+        });
+      }
+
+      // Open password form modal
+      function openPasswordFormModal(isEdit = false, passwordData = null) {
+        currentPassword = passwordData;
+        
+        if (isEdit) {
+          modalTitle.textContent = 'Şifre Düzenle';
+          savePasswordBtn.textContent = 'Güncelle';
+          platformInput.value = passwordData.platform;
+          passwordInput.value = passwordData.password;
+        } else {
+          modalTitle.textContent = 'Yeni Şifre Ekle';
+          savePasswordBtn.textContent = 'Kaydet';
+          passwordForm.reset();
+        }
+        
+        passwordFormModal.classList.remove('hidden');
+      }
+
+      // Close password form modal
+      function closePasswordFormModal() {
+        passwordFormModal.classList.add('hidden');
+        passwordForm.reset();
+        platformError.classList.add('hidden');
+        passwordError.classList.add('hidden');
+        eyeIcon.classList.remove('hidden');
+        eyeSlashIcon.classList.add('hidden');
+        passwordInput.type = 'password';
+      }
+
+      // Handle add password
+      function handleAddPassword() {
+        openPasswordFormModal(false);
+      }
+
+      // Handle edit password
+      function handleEditPassword(e) {
+        const index = parseInt(e.currentTarget.dataset.index);
+        openPasswordFormModal(true, passwords[index]);
+      }
+
+      // Handle delete password
+      function handleDeletePassword(e) {
+        const index = parseInt(e.currentTarget.dataset.index);
+        
+        if (confirm('Bu şifreyi silmek istediğinizden emin misiniz?')) {
+          passwords.splice(index, 1);
+          localStorage.setItem('passwords', JSON.stringify(passwords));
+          renderPasswordList();
+        }
+      }
+
+      // Handle save password
+      function handleSavePassword(e) {
+        e.preventDefault();
+        
+        let isValid = true;
+        
+        if (!platformInput.value.trim()) {
+          platformError.textContent = 'Platform/Servis adı gereklidir';
+          platformError.classList.remove('hidden');
+          isValid = false;
+        } else {
+          platformError.classList.add('hidden');
+        }
+        
+        if (!passwordInput.value.trim()) {
+          passwordError.textContent = 'Şifre gereklidir';
+          passwordError.classList.remove('hidden');
+          isValid = false;
+        } else {
+          passwordError.classList.add('hidden');
+        }
+        
+        if (isValid) {
+          const formData = {
+            platform: platformInput.value.trim(),
+            password: passwordInput.value.trim()
+          };
+          
+          if (currentPassword) {
+            // Edit mode
+            const index = passwords.findIndex(p => 
+              p.platform === currentPassword.platform && 
+              p.password === currentPassword.password
+            );
+            
+            if (index !== -1) {
+              passwords[index] = formData;
+            }
+          } else {
+            // Add mode
+            passwords.push(formData);
+          }
+          
+          localStorage.setItem('passwords', JSON.stringify(passwords));
+          closePasswordFormModal();
+          renderPasswordList();
+        }
+      }
+
+      // Toggle theme
+      function toggleTheme() {
+        darkMode = !darkMode;
+        
+        if (darkMode) {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+          moonIcon.classList.remove('hidden');
+          sunIcon.classList.add('hidden');
+          darkThemeBtn.classList.add('border-primary-light', 'bg-primary-dark/20');
+          darkThemeBtn.classList.remove('border-gray-700');
+          lightThemeBtn.classList.remove('border-primary-dark', 'bg-primary-light/20');
+          lightThemeBtn.classList.add('border-gray-700');
+        } else {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+          sunIcon.classList.remove('hidden');
+          moonIcon.classList.add('hidden');
+          lightThemeBtn.classList.add('border-primary-dark', 'bg-primary-light/20');
+          lightThemeBtn.classList.remove('border-gray-700');
+          darkThemeBtn.classList.remove('border-primary-light', 'bg-primary-dark/20');
+          darkThemeBtn.classList.add('border-gray-700');
+        }
+      }
+
+      // Open theme customizer modal
+      function openThemeCustomizerModal() {
+        themeCustomizerModal.classList.remove('hidden');
+      }
+
+      // Close theme customizer modal
+      function closeThemeCustomizerModal() {
+        themeCustomizerModal.classList.add('hidden');
+      }
+
+      // Handle light theme button click
+      function handleLightThemeClick() {
+        if (darkMode) {
+          toggleTheme();
+        }
+      }
+
+      // Handle dark theme button click
+      function handleDarkThemeClick() {
+        if (!darkMode) {
+          toggleTheme();
+        }
+      }
+
+      // Handle primary color change
+      function handlePrimaryColorChange() {
+        primaryColor = primaryColorInput.value;
+        applyThemeColors();
+      }
+
+      // Handle accent color change
+      function handleAccentColorChange() {
+        accentColor = accentColorInput.value;
+        applyThemeColors();
+      }
+
+      // Handle preset theme button click
+      function handlePresetThemeClick(e) {
+        const primary = e.currentTarget.dataset.primary;
+        const accent = e.currentTarget.dataset.accent;
+        
+        primaryColor = primary;
+        accentColor = accent;
+        
+        primaryColorInput.value = primary;
+        accentColorInput.value = accent;
+        
+        applyThemeColors();
+      }
+
+      // Handle save theme
+      function handleSaveTheme() {
+        localStorage.setItem('primaryColor', primaryColor);
+        localStorage.setItem('accentColor', accentColor);
+        closeThemeCustomizerModal();
+      }
+
+      // Event Listeners
+      searchInput.addEventListener('input', renderPasswordList);
+      addPasswordBtn.addEventListener('click', handleAddPassword);
+      togglePasswordBtn.addEventListener('click', togglePasswordVisibilityInForm);
+      closeModalBtn.addEventListener('click', closePasswordFormModal);
+      cancelFormBtn.addEventListener('click', closePasswordFormModal);
+      passwordForm.addEventListener('submit', handleSavePassword);
+      themeToggleBtn.addEventListener('click', toggleTheme);
+      themeCustomizerBtn.addEventListener('click', openThemeCustomizerModal);
+      closeThemeModalBtn.addEventListener('click', closeThemeCustomizerModal);
+      lightThemeBtn.addEventListener('click', handleLightThemeClick);
+      darkThemeBtn.addEventListener('click', handleDarkThemeClick);
+      primaryColorInput.addEventListener('input', handlePrimaryColorChange);
+      accentColorInput.addEventListener('input', handleAccentColorChange);
+      saveThemeBtn.addEventListener('click', handleSaveTheme);
+      
+      presetThemeBtns.forEach(btn => {
+        btn.addEventListener('click', handlePresetThemeClick);
+      });
+
+      // Initialize
+      loadPasswords();
+      loadThemePreferences();
+    });
+  </script>
+</body>
+</html>
